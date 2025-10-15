@@ -1,0 +1,3 @@
+cudaq~=0.11.0
+cudaq-solvers~=0.3.0
+matplotlib>=3.7.0
