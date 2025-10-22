@@ -146,7 +146,7 @@ def get_logical_counts(
         logical_counts.setdefault(logical_bitstring, 0)
         logical_counts[logical_bitstring] += count
 
-    print(f"Total decoding time: {1e3 * decoding_time:.3f} ms")
+    print(f"Total syndrome decoding time: {1e3 * decoding_time:.3f} ms")
     return logical_counts
 
 
