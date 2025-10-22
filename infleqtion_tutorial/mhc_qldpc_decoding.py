@@ -160,11 +160,11 @@ if __name__ == "__main__":
     mhc_state_preps = ("0000", "0111", "1110", "1111")
     for prep_string in mhc_state_preps:
         # Load experiment data run on Infleqtion's Sqale:
-        with open(f"mhc_state_{prep_string}_prep_data_counts.json") as file:
+        with open(f"mhc_sqale_data/mhc_state_{prep_string}_prep_data_counts.json") as file:
             mhc_exp_data = json.load(file)
 
         print(f"Running decoding for logical |{prep_string}> state ...")
         logical_counts = get_logical_counts(mhc_exp_data, parity_check_mat, logical_z_ops)
         tvd = compute_tvd(logical_counts, {prep_string: 1})
-        print(f"Obtained a TVD of {tvd:.5f} for logical |{prep_string}> state")
-        print("--" * 30, "\n")
+        print(f"Obtained a TVD of {tvd:.5f} against ideal for logical |{prep_string}> state")
+        print("--" * 32, "\n")
