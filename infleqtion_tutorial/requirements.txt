@@ -2,5 +2,5 @@ cudaq-solvers~=0.4.0
 cudaq-qec~=0.4.0
 ipykernel~=7.0.1
 matplotlib>=3.7.0
-general-superstaq~=0.5.53
+general-superstaq>=0.5.53
 qldpc==0.2.1
