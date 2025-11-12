@@ -1,0 +1,10 @@
+{
+  "mol_identifier": "H14_1.5_chain",
+  "basis": "sto-6g",
+  "spin": 0,
+  "total_h_atoms": 14,
+  "h_spacing": 1.5,
+  "ansatz": "UCCSD",
+  "num_excitations": 3381,
+  "num_pauli_terms": 26460
+}
