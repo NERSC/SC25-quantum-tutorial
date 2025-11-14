@@ -1,5 +1,5 @@
 # SC25-quantum-tutorial
-Repository contains all the tutorial materials for the SC25 workshop [Accelerated Quantum Supercomputing in Action: A Hands-on Tutorial on Scalable Hybrid Algorithms and Quantum Error Correction ](https://sc25.conference-program.com/presentation/?id=tut162&sess=sess272)), a collaboration with NERSC, NVIDIA, and Infleqtion. 
+Repository contains all the tutorial materials for the SC25 workshop [Accelerated Quantum Supercomputing in Action: A Hands-on Tutorial on Scalable Hybrid Algorithms and Quantum Error Correction](https://sc25.conference-program.com/presentation/?id=tut162&sess=sess272), a collaboration with NERSC, NVIDIA, and Infleqtion. 
 
 ## Description
 
