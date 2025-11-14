@@ -1,5 +1,5 @@
 # SC25-quantum-tutorial
-Repository contains all the tutorial materials for the SC25 workshop [Accelerated Quantum Supercomputing in Action: A Hands-on Tutorial on Scalable Hybrid Algorithms and Quantum Error Correction ](https://sc24.conference-program.com/presentation/?id=tut167&sess=sess407), a collaboration with NERSC, NVIDIA, and Infleqtion. 
+Repository contains all the tutorial materials for the SC25 workshop [Accelerated Quantum Supercomputing in Action: A Hands-on Tutorial on Scalable Hybrid Algorithms and Quantum Error Correction ](https://sc25.conference-program.com/presentation/?id=tut162&sess=sess272)), a collaboration with NERSC, NVIDIA, and Infleqtion. 
 
 ## Description
 
@@ -17,13 +17,12 @@ Dedicated compute on Perlmutter and Infleqtion QPU will be provided during the t
 
 The tutorial runs from 1:30am - 5:00pm EST.  There are four sessions separated by breaks.  The tentative agenda for each session follows:
 
-* **8:30-10:00am:** Overview of methods of accelerating quantum simulation with GPUs including a hands-on QAOA example with CUDA-Q 
-* 10:00-10:30: Break
-* **10:30-noon:** Live demo local install of CUDA-Q followed by an introduction to large scale clusters, how to navigate and use them 
-* noon-1:30pm: Lunch break
-* **1:30-3:00pm:** Hands-on Example: Quantum Chemistry and Nuclear Physics examples at NERSC and a industry use case of simulating Hamiltonians of molecules with 30,000 terms
-* 3:00-3:30pm: Break 
-* **3:30-5:00pm:** Finish the industry use case example, run a Quantum Resevoir Computing example with QuEra, and conclude the session
+* **1:30-2:30pm:** Overview of methods of accelerating quantum simulation with GPUs including a hands-on VQE example with CUDA-Q
+* **2:30-3:00pm:** GQE
+* 3:00-3:30: Break
+* **3:30-4:00:** GQE continued
+* **4:00-5:00pm:** Infleqtion
+
 
 ## Resources
-The slides for all the sessions are collated in the file [quantum-accelerated-supercomputing-sc24.pdf](quantum-accelerated-supercomputing-sc24.pdf). Tutorial notebooks and other resources for each session are found in the directories of this repository.
+The slides for all the sessions are collated in the file TBD. Tutorial notebooks and other resources for each session are found in the directories of this repository.
