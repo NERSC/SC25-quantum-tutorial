@@ -1,6 +1,0 @@
-cudaqx
-lightning
-transformers
-ml-collections
-numpy
-torch
