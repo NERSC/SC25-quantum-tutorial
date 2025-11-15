@@ -28,7 +28,7 @@ The tutorial runs from **1:30pm - 5:00pm CST**. The tentative agenda follows:
 
 * **3:00pm - 3:30pm:** *Break*
 
-* **3:30pm - 4:00pm:** GQE (continued)
+* **3:30pm - 4:00pm:** GQE (continued) + examples from AFQMC
 
 * **4:00pm - 5:00pm:** Infleqtion Sqale Platform
 
