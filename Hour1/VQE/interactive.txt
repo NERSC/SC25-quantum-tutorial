@@ -1,0 +1,7 @@
+
+# run in interactive mode
+salloc -N 1 --gpus-per-task 1 --ntasks-per-node 1 -C gpu -t 00:30:00 -A ntrain6 -q interactive --image=nersc/cudaq:0.12.1
+
+# submit sript
+srun -n 1 --cpu-bind=cores --gpu-bind=none --mpi=pmix --module cuda-mpich shifter python VQE_intro_Perlmutter.py
+
