@@ -7,68 +7,7 @@ import openfermion
 from openfermion import FermionOperator, PolynomialTensor
 from openfermion import InteractionOperator, get_fermion_operator
 from openfermion.transforms import jordan_wigner
-
-def create_molecule(geometry,
-                    basis='sto-3g',
-                    charge=0,
-                    spin=0,
-                    n_active_orbitals=None,
-                    n_active_electrons=None):
-
-    mol = gto.Mole()
-    mol.atom = geometry
-    mol.basis = basis
-    mol.charge = charge
-    mol.spin = spin
-    mol.build()
-
-    mf = scf.RHF(mol)
-    mf.kernel()
-
-    if n_active_orbitals is None:
-        n_active_orbitals = mol.nao
-    if n_active_electrons is None:
-        n_active_electrons = mol.nelectron
-
-    mc = mcscf.CASCI(mf, n_active_orbitals, n_active_electrons)
-    mc.kernel()
-
-    # Get correct CAS orbitals
-    ncore = mc.ncore
-    ncas  = mc.ncas
-    mo = mc.mo_coeff[:, ncore:ncore+ncas]
-
-    # One-electron integrals
-    h1 = mo.T @ mf.get_hcore() @ mo
-
-    # Two-electron integrals
-    eri_ao = mol.intor("int2e")
-    eri_mo = ao2mo.incore.full(eri_ao, mo)
-    eri_mo = ao2mo.restore(1, eri_mo, ncas)
-
-    # Build OpenFermion InteractionOperator
-    h2 = np.transpose(eri_mo, (0,2,1,3))
-    H_f = InteractionOperator(0.0, h1, h2)
-
-    # Convert → FermionOperator
-    H_ferm_op = get_fermion_operator(H_f)
-
-    # JW → QubitOperator
-    H_qubit_of = jordan_wigner(H_ferm_op)
-    H_qubit_real=openfermion.ops.operators.qubit_operator.QubitOperator()
-    for term, coeff in H_qubit_of.terms.items():
-        H_qubit_real += openfermion.ops.operators.qubit_operator.QubitOperator(term, coeff.real)
-    Spin_operator = cudaq.SpinOperator(H_qubit_real)
-
-    # Build CUDA-Q SpinOperator
-    #Spin_operator = cudaq.SpinOperator(H_qubit_of)
-
-    class MolObj: pass
-    m = MolObj()
-    m.hamiltonian = Spin_operator
-    m.n_orbitals = ncas
-    m.n_electrons = n_active_electrons
-    return m
+from utils import create_molecule
 
 # Create the molecular hamiltonian
 geometry = [('H', (0., 0., 0.)), ('H', (0., 0., 0.74))]

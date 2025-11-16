@@ -25,72 +25,7 @@ from scipy.optimize import minimize
 import matplotlib.pyplot as plt
 from pyscf import gto, scf, ao2mo, mcscf
 import numpy as np
-import openfermion
-from openfermion import FermionOperator, PolynomialTensor
-from openfermion import InteractionOperator, get_fermion_operator
-from openfermion.transforms import jordan_wigner
-
-def create_molecule(geometry,
-                    basis='sto-3g',
-                    charge=0,
-                    spin=0,
-                    n_active_orbitals=None,
-                    n_active_electrons=None):
-
-    mol = gto.Mole()
-    mol.atom = geometry
-    mol.basis = basis
-    mol.charge = charge
-    mol.spin = spin
-    mol.build()
-
-    mf = scf.RHF(mol)
-    mf.kernel()
-
-    if n_active_orbitals is None:
-        n_active_orbitals = mol.nao
-    if n_active_electrons is None:
-        n_active_electrons = mol.nelectron
-
-    mc = mcscf.CASCI(mf, n_active_orbitals, n_active_electrons)
-    mc.kernel()
-
-    # Get correct CAS orbitals
-    ncore = mc.ncore
-    ncas  = mc.ncas
-    mo = mc.mo_coeff[:, ncore:ncore+ncas]
-
-    # One-electron integrals
-    h1 = mo.T @ mf.get_hcore() @ mo
-
-    # Two-electron integrals
-    eri_ao = mol.intor("int2e")
-    eri_mo = ao2mo.incore.full(eri_ao, mo)
-    eri_mo = ao2mo.restore(1, eri_mo, ncas)
-
-    # Build OpenFermion InteractionOperator
-    h2 = np.transpose(eri_mo, (0,2,1,3))
-    H_f = InteractionOperator(0.0, h1, h2)
-
-    # Convert → FermionOperator
-    H_ferm_op = get_fermion_operator(H_f)
-
-    # JW → QubitOperator
-    H_qubit_of = jordan_wigner(H_ferm_op)
-    H_qubit_real=openfermion.ops.operators.qubit_operator.QubitOperator()
-    for term, coeff in H_qubit_of.terms.items():
-        H_qubit_real += openfermion.ops.operators.qubit_operator.QubitOperator(term, coeff.real)
-    Spin_operator = cudaq.SpinOperator(H_qubit_real)
-
-    # Build CUDA-Q SpinOperator
-    #Spin_operator = cudaq.SpinOperator(H_qubit_of)
-
-    class MolObj: pass
-    m = MolObj()
-    m.hamiltonian = Spin_operator
-    m.n_orbitals = ncas
-    m.n_electrons = n_active_electrons
-    return m
+from utils import create_molecule
 
 import argparse, cudaq
 from mpi4py import MPI
@@ -149,121 +84,121 @@ params = [
 ]
 
 
-#def pool(params):
-#    ops = []
-#    i = 0
-#
-#    ops.append(
-#        cudaq.SpinOperator(
-#            spin.y(i) * spin.z(i + 1) * spin.x(i + 2) * spin.i(i + 3)))
-#    ops.append(
-#        cudaq.SpinOperator(
-#            spin.x(i) * spin.z(i + 1) * spin.y(i + 2) * spin.i(i + 3)))
-#    ops.append(
-#        cudaq.SpinOperator(
-#            spin.i(i) * spin.y(i + 1) * spin.z(i + 2) * spin.x(i + 3)))
-#    ops.append(
-#        cudaq.SpinOperator(
-#            spin.i(i) * spin.x(i + 1) * spin.z(i + 2) * spin.y(i + 3)))
-#    ops.append(
-#        cudaq.SpinOperator(
-#            spin.x(i) * spin.x(i + 1) * spin.x(i + 2) * spin.y(i + 3)))
-#    ops.append(
-#        cudaq.SpinOperator(
-#            spin.x(i) * spin.x(i + 1) * spin.y(i + 2) * spin.x(i + 3)))
-#    ops.append(
-#        cudaq.SpinOperator(
-#            spin.x(i) * spin.y(i + 1) * spin.y(i + 2) * spin.y(i + 3)))
-#    ops.append(
-#        cudaq.SpinOperator(
-#            spin.y(i) * spin.x(i + 1) * spin.y(i + 2) * spin.y(i + 3)))
-#    ops.append(
-#        cudaq.SpinOperator(
-#            spin.x(i) * spin.y(i + 1) * spin.x(i + 2) * spin.x(i + 3)))
-#    ops.append(
-#        cudaq.SpinOperator(
-#            spin.y(i) * spin.x(i + 1) * spin.x(i + 2) * spin.x(i + 3)))
-#    ops.append(
-#        cudaq.SpinOperator(
-#            spin.y(i) * spin.y(i + 1) * spin.x(i + 2) * spin.y(i + 3)))
-#    ops.append(
-#        cudaq.SpinOperator(
-#            spin.y(i) * spin.y(i + 1) * spin.y(i + 2) * spin.x(i + 3)))
-#
-#    pool = []
-#    for c in params:
-#        for op in ops:
-#            pool.append(c * op)
-#
-#    return pool
-#
-#
-#op_pool = pool(params)
-#
-#
-#def term_coefficients(op: cudaq.SpinOperator) -> list[complex]:
-#    return [term.evaluate_coefficient() for term in op]
-#
-#
-#def term_words(op: cudaq.SpinOperator) -> list[cudaq.pauli_word]:
-#    return [term.get_pauli_word(n_qubits) for term in op]
-#
-#
-## Kernel that applies the selected operators
-#@cudaq.kernel
-#def kernel(n_qubits: int, n_electrons: int, coeffs: list[float],
-#           words: list[cudaq.pauli_word]):
-#    q = cudaq.qvector(n_qubits)
-#
-#    for i in range(n_electrons):
-#        x(q[i])
-#
-#    for i in range(len(coeffs)):
-#        exp_pauli(coeffs[i], q, words[i])
-#
-#
-#def cost(sampled_ops: list[cudaq.SpinOperator], **kwargs):
-#
-#    full_coeffs = []
-#    full_words = []
-#
-#    for op in sampled_ops:
-#        full_coeffs += [c.real for c in term_coefficients(op)]
-#        full_words += term_words(op)
-#
-#    if args.mpi:
-#        handle = cudaq.observe_async(kernel,
-#                                     spin_ham,
-#                                     n_qubits,
-#                                     n_electrons,
-#                                     full_coeffs,
-#                                     full_words,
-#                                     qpu_id=kwargs['qpu_id'])
-#        return handle, lambda res: res.get().expectation()
-#    else:
-#        return cudaq.observe(kernel, spin_ham, n_qubits, n_electrons,
-#                             full_coeffs, full_words).expectation()
-#
-#
-## Configure GQE
-#cfg = get_default_config()
-#cfg.use_fabric_logging = False
-#logger = CSVLogger("gqe_h2_logs/gqe.csv")
-#cfg.fabric_logger = logger
-#cfg.save_trajectory = False
-#cfg.verbose = True
-#
-## Run GQE
-#minE, best_ops = solvers.gqe(cost, op_pool, max_iters=25, ngates=10, config=cfg)
-#
-## Only print results from rank 0 when using MPI
-#if not args.mpi or rank == 0:
-#    print(f'Ground Energy = {minE}')
-#    print('Ansatz Ops')
-#    for idx in best_ops:
-#        # Get the first (and only) term since these are simple operators
-#        term = next(iter(op_pool[idx]))
-#        print(term.evaluate_coefficient().real, term.get_pauli_word(n_qubits))
-#
-##if args.mpi:
-##    cudaq.mpi.finalize()
+def pool(params):
+   ops = []
+   i = 0
+
+   ops.append(
+       cudaq.SpinOperator(
+           spin.y(i) * spin.z(i + 1) * spin.x(i + 2) * spin.i(i + 3)))
+   ops.append(
+       cudaq.SpinOperator(
+           spin.x(i) * spin.z(i + 1) * spin.y(i + 2) * spin.i(i + 3)))
+   ops.append(
+       cudaq.SpinOperator(
+           spin.i(i) * spin.y(i + 1) * spin.z(i + 2) * spin.x(i + 3)))
+   ops.append(
+       cudaq.SpinOperator(
+           spin.i(i) * spin.x(i + 1) * spin.z(i + 2) * spin.y(i + 3)))
+   ops.append(
+       cudaq.SpinOperator(
+           spin.x(i) * spin.x(i + 1) * spin.x(i + 2) * spin.y(i + 3)))
+   ops.append(
+       cudaq.SpinOperator(
+           spin.x(i) * spin.x(i + 1) * spin.y(i + 2) * spin.x(i + 3)))
+   ops.append(
+       cudaq.SpinOperator(
+           spin.x(i) * spin.y(i + 1) * spin.y(i + 2) * spin.y(i + 3)))
+   ops.append(
+       cudaq.SpinOperator(
+           spin.y(i) * spin.x(i + 1) * spin.y(i + 2) * spin.y(i + 3)))
+   ops.append(
+       cudaq.SpinOperator(
+           spin.x(i) * spin.y(i + 1) * spin.x(i + 2) * spin.x(i + 3)))
+   ops.append(
+       cudaq.SpinOperator(
+           spin.y(i) * spin.x(i + 1) * spin.x(i + 2) * spin.x(i + 3)))
+   ops.append(
+       cudaq.SpinOperator(
+           spin.y(i) * spin.y(i + 1) * spin.x(i + 2) * spin.y(i + 3)))
+   ops.append(
+       cudaq.SpinOperator(
+           spin.y(i) * spin.y(i + 1) * spin.y(i + 2) * spin.x(i + 3)))
+
+   pool = []
+   for c in params:
+       for op in ops:
+           pool.append(c * op)
+
+   return pool
+
+
+op_pool = pool(params)
+
+
+def term_coefficients(op: cudaq.SpinOperator) -> list[complex]:
+   return [term.evaluate_coefficient() for term in op]
+
+
+def term_words(op: cudaq.SpinOperator) -> list[cudaq.pauli_word]:
+   return [term.get_pauli_word(n_qubits) for term in op]
+
+
+# Kernel that applies the selected operators
+@cudaq.kernel
+def kernel(n_qubits: int, n_electrons: int, coeffs: list[float],
+          words: list[cudaq.pauli_word]):
+   q = cudaq.qvector(n_qubits)
+
+   for i in range(n_electrons):
+       x(q[i])
+
+   for i in range(len(coeffs)):
+       exp_pauli(coeffs[i], q, words[i])
+
+
+def cost(sampled_ops: list[cudaq.SpinOperator], **kwargs):
+
+   full_coeffs = []
+   full_words = []
+
+   for op in sampled_ops:
+       full_coeffs += [c.real for c in term_coefficients(op)]
+       full_words += term_words(op)
+
+   if args.mpi:
+       handle = cudaq.observe_async(kernel,
+                                    spin_ham,
+                                    n_qubits,
+                                    n_electrons,
+                                    full_coeffs,
+                                    full_words,
+                                    qpu_id=kwargs['qpu_id'])
+       return handle, lambda res: res.get().expectation()
+   else:
+       return cudaq.observe(kernel, spin_ham, n_qubits, n_electrons,
+                            full_coeffs, full_words).expectation()
+
+
+# Configure GQE
+cfg = get_default_config()
+cfg.use_fabric_logging = False
+logger = CSVLogger("gqe_h2_logs/gqe.csv")
+cfg.fabric_logger = logger
+cfg.save_trajectory = False
+cfg.verbose = True
+
+# Run GQE
+minE, best_ops = solvers.gqe(cost, op_pool, max_iters=25, ngates=10, config=cfg)
+
+# Only print results from rank 0 when using MPI
+if not args.mpi or rank == 0:
+   print(f'Ground Energy = {minE}')
+   print('Ansatz Ops')
+   for idx in best_ops:
+       # Get the first (and only) term since these are simple operators
+       term = next(iter(op_pool[idx]))
+       print(term.evaluate_coefficient().real, term.get_pauli_word(n_qubits))
+
+#if args.mpi:
+#    cudaq.mpi.finalize()
