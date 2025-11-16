@@ -12,7 +12,7 @@ In this tutorial, participants will gain hands-on experience by building hybrid 
 
 Live demonstrations on NERSC’s Perlmutter supercomputer and Infleqtion’s Sqale neutral-atom QPU will showcase the value of GPU-accelerated quantum applications and QEC. Practical examples in `CUDA-Q` will include GPU-accelerated decoders on Perlmutter and the demonstration of logical qubits using VQE for a material science application.
 
-For advanced participants, notebooks will also cover algorithms such as contextual machine learning (CML), QAOA-GPT, and Auxiliary Field Quantum Monte-Carlo (AFMQC).
+For advanced participants, notebooks will also cover algorithms such QAOA-GPT and Auxiliary Field Quantum Monte-Carlo (AFMQC). For additional examples, please visit the [applications section in CUDA-Q docs](https://nvidia.github.io/cuda-quantum/latest/using/applications.html). 
 
 Participants will leave with practical skills in building hybrid quantum-classical applications, an understanding of performance-critical AQSC components, and familiarity with emerging techniques in scalable quantum algorithm design and QEC.
 
