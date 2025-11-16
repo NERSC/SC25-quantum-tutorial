@@ -27,7 +27,7 @@ from cudaq_solvers.gqe_algorithm.gqe import get_default_config
 
 # Set deterministic seed and environment variables for deterministic behavior
 # Disable this section for non-deterministic behavior
-import os, torch
+import os, torch, numpy as np
 
 os.environ['CUBLAS_WORKSPACE_CONFIG'] = ':4096:8'
 torch.manual_seed(3047)
@@ -39,62 +39,39 @@ torch.backends.cudnn.benchmark = False
 spin_ham = spin.z(0)*spin.z(3)
 n_qubits = 4
 
-# Generate the operator pool consisting of e^{i*P_j*t_j}
+thetas = [np.pi/2, np.pi/4, np.pi/8, 3*np.pi/8, 3*np.pi/4, 3*np.pi/2]
 
-# These are the coefs t_j's
-params = [0.05, -0.05, 0.1, -0.1]
-
-def pool(params):
-    ops = []
-    i = 0
-
-    ops.append(cudaq.SpinOperator(spin.y(i) * spin.z(i + 1) * spin.x(i + 2) * spin.i(i + 3)))
-    ops.append(cudaq.SpinOperator(spin.x(i) * spin.z(i + 1) * spin.y(i + 2) * spin.i(i + 3)))
-    ops.append(cudaq.SpinOperator(spin.y(i) * spin.y(i + 1) * spin.y(i + 2) * spin.x(i + 3)))
-
+# Assuming we only want to apply a sequence of rx gates
+# Storing relevnat parameters for the rx gates as the op pool (qubits and thetas)
+def pool(thetas):
     pool = []
-    for c in params:
-        for op in ops:
-            pool.append(c * op)
+
+    for i in range(n_qubits):
+        for theta in thetas:
+            pool.append({'qubit': i, 'theta': theta})
 
     return pool
 
-
-op_pool = pool(params)
-
-def term_coefficients(op: cudaq.SpinOperator) -> list[complex]:
-    return [term.evaluate_coefficient() for term in op]
-
-
-def term_words(op: cudaq.SpinOperator) -> list[cudaq.pauli_word]:
-    return [term.get_pauli_word(n_qubits) for term in op]
-
+op_pool = pool(thetas)
 
 # Kernel that applies the selected operators
 @cudaq.kernel
-def kernel(n_qubits: int, coeffs: list[float],
-           words: list[cudaq.pauli_word]):
+def kernel(n_qubits: int, thetas: list[float], qubits: list[int]):
     q = cudaq.qvector(n_qubits)
 
     for i in range(n_qubits//2):
         x(q[i])
 
-    for i in range(len(coeffs)):
-        exp_pauli(coeffs[i], q, words[i])
+    for i in range(len(thetas)):
+        rx(thetas[i], q[qubits[i]])
 
+# The transformer returned a list of our paramter dicts
+# Since the kernel doesn't accept a list of dicts, we extract them here to pass in
+def cost(sampled_ops: list[dict], **kwargs):
+    thetas = [op['theta'] for op in sampled_ops]
+    qubits = [op['qubit'] for op in sampled_ops]
 
-def cost(sampled_ops: list[cudaq.SpinOperator], **kwargs):
-
-    full_coeffs = []
-    full_words = []
-
-    for op in sampled_ops:
-        full_coeffs += [c.real for c in term_coefficients(op)]
-        full_words += term_words(op)
-
-        return cudaq.observe(kernel, spin_ham, n_qubits, full_coeffs,
-                            full_words).expectation()
-
+    return cudaq.observe(kernel, spin_ham, n_qubits, thetas, qubits).expectation()
 
 # Configure GQE
 cfg = get_default_config()
