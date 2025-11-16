@@ -2,6 +2,9 @@
 
 Run the requirements.txt file using `pip install -r requirements.txt`. 
 
+## Algorithm Description
+See the [slide deck](https://github.com/NERSC/SC25-quantum-tutorial/blob/main/Hour2/GQE/gqe_slides.pdf) to learn about this algorithm.
+
 ## Script Descriptions
 
 There are three main scripts in this folder, each with a specific purpose.
