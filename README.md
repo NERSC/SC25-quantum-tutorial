@@ -4,6 +4,8 @@ Repository contains all the tutorial materials for the SC25 tutorial: [**Acceler
 
 This tutorial is a collaboration between [NVIDIA](https://www.nvidia.com/), [NERSC](https://www.nersc.gov/), and [Infleqtion](https://www.infleqtion.com/).
 
+Open-source platform and SDK used here: [CUDA-Q](https://nvidia.github.io/cuda-quantum/latest/index.html)
+
 ## Description
 
 Accelerated quantum supercomputing (AQSC) tightly integrates quantum computing with classical accelerated supercomputing via low-latency interconnects. This is crucial for hybrid quantum-classical workflows, enabling scalable quantum algorithms, real-time quantum error correction (QEC), and fast feedback control.
