@@ -38,8 +38,8 @@ Tutorial notebooks and other resources for each session are found in the directo
 
 Additional material can be found at:
 
-* **CUDA-Q Docs:** <https://developer.nvidia.com/cuda-q>
+* **CUDA-Q Docs:** <https://github.com/NVIDIA/cuda-quantum>
 
-* **CUDA-QX Docs:** <https://nvidia.github.io/cudaqx/index.html>
+* **CUDA-QX Docs:** <https://github.com/NVIDIA/cudaqx>
 
 * **CUDA-Q Academic:** <https://github.com/NVIDIA/cuda-q-academic>
