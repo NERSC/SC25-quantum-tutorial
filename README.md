@@ -20,7 +20,7 @@ Dedicated compute on Perlmutter and Infleqtion QPU will be provided during the t
 
 ## Tutorial Schedule
 
-[Detailed outline is provided here.](https://github.com/NERSC/SC25-quantum-tutorial/blob/main/SC25_Tutorial_Detailed_Outline.pdf).
+[Detailed outline is provided here.](https://github.com/NERSC/SC25-quantum-tutorial/blob/main/SC25_Tutorial_Detailed_Outline.pdf)
 
 The tutorial runs from **1:30pm - 5:00pm CST**. The tentative agenda follows:
 
