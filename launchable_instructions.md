@@ -8,3 +8,5 @@ A coupon code will be provided during the workshop. Note that it may be redeemed
 **Step 3:** Once you have created and named your Brev organization, go to the "Billing" tab.
 
 **Step 4:** Scroll down and click "Redeem Code." Enter the code you were provided in the "Enter Code" field and click "Redeem." Please ensure coupon code is all lower case.
+
+**Step 5:** You can now deploy the materials in this repository in a GPU-environment by using [this link](https://brev.nvidia.com/launchable/deploy/now?launchableID=env-35RbYyJo4MHi97QuExexGUbMBNT).
