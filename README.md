@@ -41,3 +41,5 @@ Additional material can be found at:
 * **CUDA-Q Docs:** <https://developer.nvidia.com/cuda-q>
 
 * **CUDA-QX Docs:** <https://nvidia.github.io/cudaqx/index.html>
+
+* **CUDA-Q Academic:** <https://github.com/NVIDIA/cuda-q-academic>
