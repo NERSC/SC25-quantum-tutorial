@@ -20,6 +20,8 @@ Dedicated compute on Perlmutter and Infleqtion QPU will be provided during the t
 
 ## Tutorial Schedule
 
+[Detailed outline is provided here.](https://github.com/NERSC/SC25-quantum-tutorial/blob/main/SC25_Tutorial_Detailed_Outline.pdf).
+
 The tutorial runs from **1:30pm - 5:00pm CST**. The tentative agenda follows:
 
 * **1:30pm - 2:30pm:** Overview of Accelerated Quantum Supercomputing, including a hands-on VQE example with `CUDA-Q`.
@@ -31,6 +33,9 @@ The tutorial runs from **1:30pm - 5:00pm CST**. The tentative agenda follows:
 * **3:30pm - 4:00pm:** GQE (continued) + examples from AFQMC
 
 * **4:00pm - 5:00pm:** Infleqtion Sqale Platform
+
+## Compute Access
+If you did not sign up for Perlmutter access [using this form](https://forms.gle/AY5EeyMx9GQ3RtQU9) prior to the day of the tutorial, you can get access via [Launchables](https://github.com/NERSC/SC25-quantum-tutorial/blob/main/launchable_instructions.md). 
 
 ## Resources
 
